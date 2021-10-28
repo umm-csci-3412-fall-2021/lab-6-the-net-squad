@@ -5,27 +5,50 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.lang.Thread;
+
 
 public class EchoServer {
-	
-	// REPLACE WITH PORT PROVIDED BY THE INSTRUCTOR
-	public static final int PORT_NUMBER = 0; 
-	public static void main(String[] args) throws IOException, InterruptedException {
-		EchoServer server = new EchoServer();
-		server.start();
-	}
+    public static final int portNumber = 6013;
 
-	private void start() throws IOException, InterruptedException {
-		ServerSocket serverSocket = new ServerSocket(PORT_NUMBER);
-		while (true) {
-			Socket socket = serverSocket.accept();
+    public static void main(String[] args) {
+        try {
+            // Start listening on the specified port
+            ServerSocket socket = new ServerSocket(portNumber);
 
-			// Put your code here.
-			// This should do very little, essentially:
-			//   * Construct an instance of your runnable class
-			//   * Construct a Thread with your runnable
-			//      * Or use a thread pool
-			//   * Start that thread
-		}
-	}
+            // Run forever, which is common for server style services
+            while (true) {
+                // Wait until someone connects, thereby requesting a date
+                Socket client = socket.accept();
+                System.out.println("Got a request!");
+
+                // Helpful guide here:
+                // https://stackoverflow.com/questions/1830698/what-is-inputstream-output-stream-why-and-when-do-we-use-them
+                // Object that gets input from the client
+                InputStream clientInput = client.getInputStream();
+                // Object that sends output to the client
+                OutputStream clientOutput = client.getOutputStream();
+
+                // Buffer size of client input
+                byte[] bufferSize = new byte[1024];
+                int bytesRead;
+
+                // Read data sent by client socket
+                while ((bytesRead = clientInput.read(bufferSize)) != -1) {
+                    // Send data back to client console
+                    clientOutput.write(bufferSize, 0, bytesRead);
+                    // Clear buffer
+                    clientOutput.flush();
+                }
+
+                // TODO: Close the socket via client
+                // Close the client socket since we're done.
+                socket.close();
+            }
+            // *Very* minimal error handling.
+        } catch (IOException ioe) {
+            System.out.println("We caught an unexpected exception");
+            System.err.println(ioe);
+        }
+    }
 }
