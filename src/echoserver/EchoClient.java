@@ -7,17 +7,29 @@ import java.net.Socket;
 
 public class EchoClient {
 	public static final int PORT_NUMBER = 6013;
-
+	
 	public static void main(String[] args) throws IOException {
 		EchoClient client = new EchoClient();
 		client.start();
+		Thread thread = new Thread();
+		thread.start();
+
 	}
 
 	private void start() throws IOException {
 		Socket socket = new Socket("localhost", PORT_NUMBER);
 		InputStream socketInputStream = socket.getInputStream();
 		OutputStream socketOutputStream = socket.getOutputStream();
+		Thread inputThread = new Thread((Runnable) socketInputStream);
+		Thread outThread = new Thread(OutputStream);
+
 
 		// Put your code here.
+	}
+
+	public class runnable implements Runnable {
+		public void run() {
+
+		}
 	}
 }
