@@ -29,26 +29,49 @@ public class EchoServer {
                 // Object that sends output to the client
                 OutputStream clientOutput = client.getOutputStream();
 
-                // Buffer size of client input
-                byte[] bufferSize = new byte[1024];
-                int bytesRead;
+                Thread thread = new ClientHandler(client, clientInput, clientOutput);
 
-                // Read data sent by client socket
-                while ((bytesRead = clientInput.read(bufferSize)) != -1) {
-                    // Send data back to client console
-                    clientOutput.write(bufferSize, 0, bytesRead);
-                    // Clear buffer
-                    clientOutput.flush();
-                }
+                thread.start();
+                
 
-                // TODO: Close the socket via client
-                // Close the client socket since we're done.
-                socket.close();
+                
             }
             // *Very* minimal error handling.
         } catch (IOException ioe) {
             System.out.println("We caught an unexpected exception");
             System.err.println(ioe);
         }
-    }
+    }   
 }
+
+ class ClientHandler extends Thread {
+     final InputStream clientInput;
+     final OutputStream clientOutput;
+     final Socket socket;
+
+    public ClientHandler(Socket socket, InputStream clientInput, OutputStream clientOutput) {
+        this.socket = socket;
+        this.clientInput = clientInput;
+        this.clientOutput = clientOutput;
+    }
+        
+        @Override
+        public void run() {
+            // TODO Auto-generated method stub
+            // Buffer size of client input
+            byte[] bufferSize = new byte[1024];
+            int bytesRead;
+            // Read data sent by client socket
+            while ((bytesRead = clientInput.read(bufferSize)) != -1) {
+                // Send data back to client console
+                clientOutput.write(bufferSize, 0, bytesRead);
+                // Clear buffer
+                clientOutput.flush();
+            }
+
+            // TODO: Close the socket via client
+            // Close the client socket since we're done.
+            socket.close();
+        }
+        
+    }
