@@ -21,37 +21,42 @@ private void start() throws IOException, InterruptedException {
     ServerSocket serverSocket = new ServerSocket(portNumber);
 
     while (true) {
-
+        // Accept a connection
         Socket socket = serverSocket.accept();
+
+        // Create a new clientHandler and thread for the accepted connection
         clientHandler newClientConnection = new clientHandler(socket);
-
         Thread newClientThread = new Thread(newClientConnection);
-
         newClientThread.start();
     }
 }
 
 public class clientHandler implements Runnable {
 
+    // The socket where to listen/talk pre thread
     private Socket socket;
 
     public clientHandler(Socket socket) {
+        // Constructor for the clientHandler socket
         this.socket = socket;
     }
 
     public void run() {
         try {
-            InputStream fromClientStream = socket.getInputStream();
-            OutputStream toClientStream = socket.getOutputStream();
+            InputStream getClientInput = socket.getInputStream();
+            OutputStream SendClientOutput = socket.getOutputStream();
 
-            int clientInput = fromClientStream.read();
+            // Read the input from the client
+            int clientInput = getClientInput.read();
 
             while (clientInput != -1) {
-                toClientStream.write(clientInput);
-                clientInput = fromClientStream.read();
+                // Send the input back to the client
+                SendClientOutput.write(clientInput);
+                clientInput = getClientInput.read();
             }
 
-            toClientStream.flush();
+            // Close the socket
+            SendClientOutput.flush();
             socket.shutdownOutput();
 
         } catch (IOException exception) {
